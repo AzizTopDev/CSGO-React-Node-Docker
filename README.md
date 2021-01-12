@@ -1,7 +1,7 @@
 ## How to run
 
 - Clone the repository using
-  `git clone https://github.com/ArturasWi/gamesweb.git`
+  `git clone https://github.com/AzizTopDev/CSGO-React-Node-Docker.git`
 - Run `npm install` in both `api` and `ui` folders.
 - Rename `.env.example` to `.env` and replace variables with your own in both `api` and `client` folders.
 - Run `npm start` in both `api` and `client` folders. (`npm run dev` in `api` for developemenet mode)
