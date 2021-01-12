@@ -1,0 +1,326 @@
+#page-container.page-header-blue #page-header {
+    position: absolute;
+    background-color: #121041;
+}
+
+.bg-primary {
+    background-color: #058AD6;
+}
+
+.bg-primary-hover {
+    background-color: #055C96;
+}
+
+.brand-text {
+    height: 44vw;
+    min-height: 140px;
+}
+
+.brand-heading {
+    margin-top: 12vw;
+    font-size: 4vw;
+}
+
+.brand-subheading {
+    font-size: 2vw;
+}
+
+.underline-blue {
+    text-decoration: underline;
+    text-decoration-color: #058AD6;
+}
+
+.border-rounded {
+    border-radius: 0.75rem;
+}
+
+.border-primary {
+    border: 2px solid #058AD6 !important;
+}
+
+.border-bottom-primary {
+    border-bottom: 2px solid #058AD6 !important;
+}
+
+.block {
+    box-shadow: none;
+}
+
+.btn-primary {
+    background-color: #058AD6;
+    border-color: #058AD6;
+}
+
+.btn-hero-primary {
+    background-color: #058AD6 !important;
+}
+
+.btn-card {
+    font-size: 12px;
+    font-weight: bold;
+    padding-right: 20px;
+    padding-left: 20px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.card {
+    min-width: 175px;
+    height: 315px;
+    border-radius: 0.5rem;
+    border: 2px solid #058AD6;
+}
+
+.card-top-image {
+    background-size: cover;
+    min-height: 150px;
+    background-position: center;
+}
+
+.card-bottom-image {
+    background-size: cover;
+    min-height: 160px;
+}
+
+.ellipse-icon {
+    width: 7px;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-right: 0.25rem;
+}
+
+.card-font {
+    font-size: .75rem;
+    font-weight: 700;
+}
+
+.coin-icon {
+    height: 0.85rem;
+    line-height: 1.75rem;
+}
+
+.moneybag-icon {
+    height: 1.5rem;
+}
+
+.intro-image {
+    height: 26vw;
+    background-size: cover;
+    background-position: center;
+}
+
+.intro-content {
+    margin-top: 7vw;
+}
+
+.how-section {
+    /* height: 35vw; */
+    background-repeat: no-repeat;
+    background-position: 50% 195px;
+    background-size: 45%;
+}
+
+@media (max-width: 992px) {
+    .how-section {
+        background-image: none !important;
+    }
+}
+
+.how-item {
+    width: 180px;
+    height: 128px;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+/* affiliate */
+
+.btn-outline-white {
+    color: white;
+    border-color: white;
+}
+
+.vertical-divider {
+    margin: 0 1.5rem;
+    overflow: hidden;
+    border-right: 2px solid #e6ebf4;
+}
+
+.img-avatar-size {
+    width: 35px;
+    height: 35px;
+}
+
+.text-primary {
+    color: #058AD6 !important;
+}
+
+.text-primary-hover {
+    color: #055C96 !important;
+}
+
+.affiliate-card-size {
+    width: 480px;
+    min-height: 370px;
+}
+
+.height-3 {
+    height: 3rem;
+}
+
+.height-4 {
+    height: 4rem;
+}
+
+/* faq container  */
+
+.faq-container-size {
+    max-width: 800px;
+}
+
+/* sign in form */
+
+.input-container {
+    position: relative;
+}
+
+.input-container i {
+    position: absolute;
+    top: 12px;
+    left: 25px;
+}
+
+.deposit-input {
+    height: 3rem;
+}
+
+.withdraw-amount-img {
+    position: absolute;
+    top: 25%;
+    left: 15px;
+}
+
+.signin-field-icon {
+    position: absolute;
+    top: 25%;
+    left: 25px;
+}
+
+.faq-headline {
+    line-height: 37px;
+}
+
+.faq-collapse-img {
+    height: 37px;
+    cursor: pointer;
+}
+
+.panel-collapse {
+    max-height: 500px;
+    overflow: hidden;
+    transition: max-height .5s ease;
+}
+
+.panel-close {
+    max-height: 0;
+}
+
+.pos-relative {
+    position: relative;
+}
+
+.mw-60 {
+    max-width: 720px;
+}
+
+.lh-1 {
+    line-height: 1rem;
+}
+
+.h-3 {
+    height: 3rem;
+}
+
+.signin-modal-pos {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -300px;
+    margin-left: -360px;
+}
+
+.signup-modal-pos {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -360px;
+    margin-left: -360px;
+}
+
+.forgot-modal-pos {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -250px;
+    margin-left: -360px;
+}
+
+.setting-modal-pos {
+    max-width: 680px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -300px;
+    margin-left: -340px;
+}
+
+.deposit-modal-pos {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -300px;
+    margin-left: -340px;
+}
+
+.stats-modal-pos {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -250px;
+    margin-left: -340px;
+}
+
+.withdraw-modal-pos {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -250px;
+    margin-left: -340px;
+}
+
+.menu-position {
+    width: 200px;
+    position: absolute;
+    will-change: transform;
+    top: 0px;
+    left: -70px;
+    transform: translate3d(80px, 60px, 0px);
+}
+.headline-section {
+    border-radius: 0.6rem 0.6rem 0rem 0rem;
+}
+.headline-section-logo {
+    background-color: #055C96;
+    border-radius: 0.6rem 0rem 0rem 0rem;
+}
+
+@media (min-width: 768px) {
+    .menu-position {
+        width: 250px;
+        position: absolute;
+        will-change: transform;
+        top: 0px;
+        left: 0px;
+        transform: translate3d(80px, 60px, 0px);
+    }
+}
