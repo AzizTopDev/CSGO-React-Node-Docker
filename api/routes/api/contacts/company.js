@@ -8,6 +8,7 @@ router.post('/name', auth.required, async (req, res, next) => {
    if (req.body.companyName === "") return res.json({ contacts: [] });
    Company.find({ createdBy: req.payload.accountCompany, companyName: { $regex: req.body.companyName, $options: "i" } })
       .then((docs) => {
+         console.log(docs);
          return res.json({ contacts: docs });
       })
       .catch(next);
