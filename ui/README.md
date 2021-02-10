@@ -1,4 +1,13 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Quotient
+http://40.88.10.190
+
+## How to run
+
+- Clone the repository using
+  `git clone https://github.com/gobynarth/quote_app.git`
+- Run `npm install` or `yarn`.
+- To start `npm run start` or `yarn start`
+- To build `npm run build` or `yarn build`
 
 ## Available Scripts
 

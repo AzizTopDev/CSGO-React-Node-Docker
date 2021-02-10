@@ -1,108 +1,234 @@
+import { toast } from "react-toastify";
 import {
-    FETCH_ERROR,
-    FETCH_START,
-    FETCH_SUCCESS,
-    INIT_URL,
-    SIGNOUT_USER_SUCCESS,
-    USER_DATA,
-    USER_TOKEN_SET,
+   FETCH_ERROR,
+   FETCH_START,
+   FETCH_SUCCESS,
+   INIT_URL,
+   SHOW_MESSAGE,
+   SIGNOUT_USER_SUCCESS,
+   AUTH_USER_DATA,
+   ACCOUNT_COMPANY_DATA,
+   PERSON_DATA,
+   USER_TOKEN_SET,
 } from "../constants/ActionTypes";
-import axios from '../util/Api';
+import { ToastErrorNotification } from "../util";
+import axios from '../util/Api'
 
 export const setInitUrl = (url) => {
-    return {
-        type: INIT_URL,
-        payload: url
-    };
-};
-
-export const userSignUp = ({ name, email, password }) => {
-    console.log(name, email, password);
-    return (dispatch) => {
-        dispatch({ type: FETCH_START });
-        axios.post('/register', {
-            email: email,
-            name: name,
-            password: password
-        }
-        ).then(({ data }) => {
-            console.log("__ SignUp api res __ : ", data);
-            localStorage.setItem("token", JSON.stringify(data.token));
-            axios.defaults.headers.common['Authorization'] = "Bearer " + data.token;
-            dispatch({ type: FETCH_SUCCESS });
-            dispatch({ type: USER_TOKEN_SET, payload: data.token });
-            dispatch({ type: USER_DATA, payload: data.user });
-        }).catch(err => {
-            dispatch({ type: FETCH_ERROR, payload: "User registeration error !" });
-        });
-    }
-};
-
-export const userSignIn = ({ email, password }) => {
-    return (dispatch) => {
-        console.error("___ sigin in email ___", email);
-        console.error("___ sigin in password ___", password);
-        dispatch({ type: FETCH_START });
-        axios.post('/login', {
-            email: email,
-            password: password,
-        }
-        ).then(({ data }) => {
-            console.log("userSignIn: ", data);
-            localStorage.setItem("token", JSON.stringify(data.token));
-            axios.defaults.headers.common['Authorization'] = "Bearer " + data.token;
-            dispatch({ type: USER_TOKEN_SET, payload: data.token });
-            dispatch({ type: USER_DATA, payload: data.user });
-            dispatch({ type: FETCH_SUCCESS });
-        }).catch(err => {
-            dispatch({ type: FETCH_ERROR, payload: "User sign in error !" });
-            dispatch({ type: SIGNOUT_USER_SUCCESS });
-        });
-    }
+   return {
+      type: INIT_URL,
+      payload: url
+   };
 };
 
 export const getUser = () => {
-    return (dispatch) => {
-        dispatch({ type: FETCH_START });
-        axios.get('/me',
-        ).then(({ data }) => {
-            console.log("_____ getUser API RES _______", data);
-            dispatch({ type: USER_TOKEN_SET, payload: data.user.token });
-            dispatch({ type: USER_DATA, payload: data.user });
-            dispatch({ type: FETCH_SUCCESS });
-        }).catch(err => {
-            dispatch({ type: FETCH_ERROR, payload: "User not found." });
-            dispatch({ type: SIGNOUT_USER_SUCCESS });
-        });
-    }
+   return async (dispatch) => {
+      dispatch({ type: FETCH_START });
+      try {
+         const token = JSON.parse(localStorage.getItem('token'));
+         if (token) axios.defaults.headers.common['Authorization'] = "Bearer " + token;
+         const { data } = await axios.get('/account');
+         console.log("get User res => : ", data);
+         dispatch({ type: AUTH_USER_DATA, payload: data.account });
+         dispatch({ type: ACCOUNT_COMPANY_DATA, payload: data.accountCompany });
+         dispatch({ type: FETCH_SUCCESS });
+      } catch (err) {
+         localStorage.clear();
+         dispatch({ type: SIGNOUT_USER_SUCCESS });
+         dispatch({ type: FETCH_ERROR, payload: "Token expired." });
+         toast.success('Session expired. Please login again.');
+      }
+   }
 };
 
+export const userSignIn = ({ email, password, isRemember }) => {
+   return async (dispatch) => {
+      dispatch({ type: FETCH_START });
+      axios.post('/account/login', { email, password, isRemember }
+      ).then(({ data }) => {
+         localStorage.setItem("token", JSON.stringify(data.access_token));
+         if (data.access_token) axios.defaults.headers.common['Authorization'] = "Bearer " + data.access_token;
+         dispatch({ type: USER_TOKEN_SET, payload: data.access_token });
+         dispatch({ type: ACCOUNT_COMPANY_DATA, payload: data.accountCompany });
+         dispatch({ type: AUTH_USER_DATA, payload: data.account });
+         dispatch({ type: FETCH_SUCCESS });
+      }).catch((err) => {
+         // if(error.response.status === 422) dispatch({ type: FETCH_ERROR, payload: "Email or password is invalid." });
+         // console.log("Error****:", err.message);
+         dispatch({ type: FETCH_ERROR, payload: "Error during login request." });
+         if (err.response.status === 422) {
+            const { errors } = err.response.data;
+            if (errors) ToastErrorNotification(errors);
+         }
+      });
+   }
+};
+
+export const userSignUp = (payload) => {
+   const { firstName, lastName, email, password, companyName, location, history } = payload;
+   return async (dispatch) => {
+      dispatch({ type: FETCH_START });
+      axios.post('/account', {
+         firstName,
+         lastName,
+         email,
+         password,
+         companyName,
+         location
+      }).then(({ data }) => {
+         localStorage.setItem("token", JSON.stringify(data.access_token));
+         if (data.access_token) axios.defaults.headers.common['Authorization'] = "Bearer " + data.access_token;
+         console.error(" axios.defaults.headers.common  === ", axios.defaults.headers.common)
+         dispatch({ type: USER_TOKEN_SET, payload: data.access_token });
+         dispatch({ type: ACCOUNT_COMPANY_DATA, payload: data.accountCompany });
+         dispatch({ type: AUTH_USER_DATA, payload: data.account });
+         dispatch({ type: FETCH_SUCCESS });
+         history.push('/app/settings/quick-start');
+         // history.push('/app');
+      }).catch((err) => {
+         dispatch({ type: FETCH_ERROR, payload: "Error duing account registeration request." });
+         console.log("Error****:", err);
+         console.log("err.response****:", err.response);
+         console.log("err.response.data****:", err.response.data);
+         if (err.response.status === 422) {
+            const { errors } = err.response.data;
+            if (errors) ToastErrorNotification(errors);
+         }
+      });
+   }
+};
+
+export const userSignUpByInvitation = ({ _id, accountCompany, firstName, lastName, email, password, history }) => {
+   return (dispatch) => {
+      dispatch({ type: FETCH_START });
+      axios.post('/account/invited', { _id, accountCompany, firstName, lastName, email, password }
+      ).then(({ data }) => {
+         if (data.account) {
+            localStorage.setItem("token", JSON.stringify(data.access_token));
+            if (data.access_token) axios.defaults.headers.common['Authorization'] = "Bearer " + data.access_token;
+            dispatch({ type: FETCH_SUCCESS });
+            dispatch({ type: USER_TOKEN_SET, payload: data.access_token });
+            dispatch({ type: AUTH_USER_DATA, payload: data.account });
+            history.push('/app');
+         } else {
+            console.log("payload: data.error", data.error);
+            dispatch({ type: FETCH_ERROR, payload: "Network Error" });
+         }
+      }).catch(function (err) {
+         dispatch({ type: FETCH_ERROR, payload: err.message });
+         console.log("Error****:", err.message);
+         const { errors } = err.response.data;
+         console.log("Error****:", err.response.data);
+         dispatch({ type: FETCH_ERROR, payload: err.response.data });
+         ToastErrorNotification(errors);
+      });
+   }
+};
 
 export const userSignOut = () => {
-    return (dispatch) => {
-        dispatch({ type: FETCH_START });
-        axios.get('/logout',
-        ).then(({ data }) => {
+   return (dispatch) => {
+      localStorage.clear();
+      dispatch({ type: SIGNOUT_USER_SUCCESS });
+      // dispatch({ type: FETCH_START });
+      // axios.get('/account/logout',
+      // ).then(({ data }) => {
+      //    if (data.status === "success") {
+      //       localStorage.removeItem("token");
+      //       dispatch({ type: FETCH_SUCCESS });
+      //       dispatch({ type: SIGNOUT_USER_SUCCESS });
+      //    } else {
+      //       dispatch({ type: FETCH_ERROR, payload: data.error });
+      //    }
+      // }).catch(function (error) {
+      //    dispatch({ type: FETCH_ERROR, payload: error.message });
+      //    console.log("Error****:", error.message);
+      // });
+   }
+};
+export const userUpdate = ({ firstName, lastName, email, image, password }) => {
+   console.log(firstName, lastName, email, image, password);
+   return (dispatch) => {
+      dispatch({ type: FETCH_START });
+      axios.post('/account', { firstName, lastName, email, image, password }
+      ).then(({ data }) => {
+         console.log("data:", data);
+         if (data.account) {
             dispatch({ type: FETCH_SUCCESS });
-            localStorage.removeItem("token");
-            dispatch({ type: SIGNOUT_USER_SUCCESS });
-        }).catch(err => {
-            dispatch({ type: FETCH_ERROR, payload: "User sign out failed !" });
-        });
-    }
+            dispatch({ type: USER_TOKEN_SET, payload: data.access_token });
+            dispatch({ type: AUTH_USER_DATA, payload: data.account });
+         } else {
+            console.log("payload: data.error", data.error);
+            dispatch({ type: FETCH_ERROR, payload: "Network Error" });
+         }
+      }).catch(function (err) {
+         console.log("Error****:", err.message);
+         dispatch({ type: FETCH_ERROR, payload: err.message });
+         const { errors } = err.response.data;
+         console.log("Error****:", err.response.data);
+         dispatch({ type: FETCH_ERROR, payload: err.response.data });
+         ToastErrorNotification(errors);
+      });
+   }
 };
 
-export const resendEmail = () => {
-    return (dispatch) => {
-        dispatch({ type: FETCH_START });
-        axios.get('/email/resend')
-            .then(({ data }) => {
-                console.log(" resend email api success: ", data.message)
-                dispatch({ type: FETCH_SUCCESS, payload: data.message });
-            })
-            .catch(err => {
-                console.error(" resend email api error : ", err);
-                dispatch({ type: FETCH_ERROR, payload: "" });
-            });
-    }
+export const userResetPassword = ({ entoken, password }, ownProps) => {
+   return (dispatch) => {
+      dispatch({ type: FETCH_START });
+      // dispatch({ type: USER_TOKEN_SET, payload: null });
+      // dispatch({ type: AUTH_USER_DATA, payload: null });
+      axios.post('/reset-password', { entoken, password }
+      ).then(({ data }) => {
+         if (data.isValid) {
+            localStorage.setItem("token", JSON.stringify(data.access_token));
+            if (data.access_token) axios.defaults.headers.common['Authorization'] = "Bearer " + data.access_token;
+            dispatch({ type: FETCH_SUCCESS });
+            dispatch({ type: USER_TOKEN_SET, payload: data.access_token });
+            dispatch({ type: AUTH_USER_DATA, payload: data.account });
+            ownProps.history.push('/app');
+         } else {
+            console.log(" User Reset password error ========> ", data);
+            dispatch({ type: FETCH_ERROR, payload: data.message });
+            ownProps.history.push('/request-password/new/expired');
+         }
+      }).catch((err) => {
+         console.log("User Reset password Error****:", err.message);
+         const { errors } = err.response.data;
+         console.log("Error****:", err.response.data);
+         dispatch({ type: FETCH_ERROR, payload: err.response.data });
+         ToastErrorNotification(errors);
+      });
+   }
 }
+
+export const updateAccountInfo = (payload, history) => {
+   const { companyName, companyDisplayName, owner, location, timeZone, dateFormat } = payload;
+   return async (dispatch) => {
+      dispatch({ type: FETCH_START });
+      try {
+         const { data } = await axios.put('/account-company', { companyName, companyDisplayName, owner, location, timeZone, dateFormat });
+         dispatch({ type: FETCH_SUCCESS });
+         dispatch({ type: ACCOUNT_COMPANY_DATA, payload: data.accountCompany });
+         history.push('/app/settings');
+      } catch (err) {
+         console.log("Error****:", err.response.data);
+         dispatch({ type: FETCH_ERROR, payload: err.response.data });
+         toast.error('Failed to update account.');
+      }
+   }
+}
+
+export const getPublicViewPersonWithEntoken = () => {
+   const entoken = localStorage.getItem('entoken');
+   return async (dispatch) => {
+      dispatch({ type: FETCH_START });
+      try {
+         const { data } = await axios.post('/quotes/view-public/person', { entoken });
+         console.log("========== Publick overview person =========", data);
+         dispatch({ type: FETCH_SUCCESS });
+         dispatch({ type: PERSON_DATA, payload: data.person });
+      } catch (err) {
+         dispatch({ type: FETCH_ERROR, payload: err.message });
+         console.log("Error****:", err.message);
+      }
+   }
+};
